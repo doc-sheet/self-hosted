@@ -34,7 +34,6 @@ jobs:
         run: ./unit-test.sh
 
   integration-test:
-    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
