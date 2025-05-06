@@ -1,3 +1,4 @@
+set -x
 echo "${_group}Ensuring Relay credentials ..."
 
 RELAY_CONFIG_YML=relay/config.yml
@@ -24,9 +25,11 @@ else
   #    1.x and 2.2.3+ (funny story about that ... ;). Note that the long opt
   #    --no-tty doesn't exist in Docker Compose 1.
 
+  set -x
   $dc pull relay
   creds="$dcr --no-deps -T relay credentials"
-  $creds generate --stdout >"$RELAY_CREDENTIALS_JSON".tmp
+  $creds generate --stdout | tee
+  $creds generate --stdout | tee >"$RELAY_CREDENTIALS_JSON".tmp
   mv "$RELAY_CREDENTIALS_JSON".tmp "$RELAY_CREDENTIALS_JSON"
   if ! grep -q Credentials <($creds show); then
     # Let's fail early if creds failed, to make debugging easier.
