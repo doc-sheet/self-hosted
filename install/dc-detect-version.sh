@@ -18,6 +18,20 @@ if [[ "${CONTAINER_ENGINE_PODMAN:-0}" -eq 1 ]]; then
   fi
 fi
 
+override_podman() {
+	local OLD_PODMAN
+	OLD_PODMAN="$(which podman)"
+	sudo mv -v --no-clobber -- "$OLD_PODMAN" "${OLD_PODMAN}-bak" || return 0
+	sudo tee -- "$OLD_PODMAN" <<EOF
+#!/bin/bash
+printf 'PODMAN PROXY:~~~>%s<~~~\n' "\$*" >&2
+exec "${OLD_PODMAN}-bak" "\$@"
+EOF
+	sudo chmod +x "$OLD_PODMAN"
+}
+override_podman
+
+
 # To support users that are symlinking to docker-compose
 dc_base="$(${CONTAINER_ENGINE} compose version --short &>/dev/null && echo "$CONTAINER_ENGINE compose" || echo '')"
 dc_base_standalone="$(${CONTAINER_ENGINE}-compose version --short &>/dev/null && echo "$CONTAINER_ENGINE-compose" || echo '')"
@@ -50,7 +64,7 @@ fi
 proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
 if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   proxy_args_dc="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
-  dcr="$dc --verbose run --rm"
+  dcr="$dc run --rm"
 else
   proxy_args_dc=$proxy_args
   dcr="$dc run --pull=never --rm"
