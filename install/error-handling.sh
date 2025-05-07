@@ -170,6 +170,11 @@ DID_CLEAN_UP=0
 # the cleanup function will be the exit point
 cleanup() {
   local retcode=$?
+
+  echo 'CLEANUP--------'
+  cat "$PODMAN_DEBUG_LOG"
+
+
   local cmd="${BASH_COMMAND}"
   if [[ "$DID_CLEAN_UP" -eq 1 ]]; then
     return 0

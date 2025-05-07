@@ -22,6 +22,8 @@ override_podman() {
 	local OLD_PODMAN
 	OLD_PODMAN="$(which podman)"
 	sudo mv -v --no-clobber -- "$OLD_PODMAN" "${OLD_PODMAN}-bak" || return 0
+	PODMAN_DEBUG_LOG="$(mktemp)"
+	export PODMAN_DEBUG_LOG
 	sudo tee -- "$OLD_PODMAN" <<EOF
 #!/bin/bash
 printf 'PODMAN PROXY:~~~>%s<~~~\n' "\$*" >&2
@@ -64,7 +66,7 @@ fi
 proxy_args="--build-arg http_proxy=${http_proxy:-} --build-arg https_proxy=${https_proxy:-} --build-arg no_proxy=${no_proxy:-}"
 if [[ "$CONTAINER_ENGINE" == "podman" ]]; then
   proxy_args_dc="--podman-build-args http_proxy=${http_proxy:-},https_proxy=${https_proxy:-},no_proxy=${no_proxy:-}"
-  dcr="$dc run --rm"
+  dcr="$dc --in-pod=false run --rm"
 else
   proxy_args_dc=$proxy_args
   dcr="$dc run --pull=never --rm"
