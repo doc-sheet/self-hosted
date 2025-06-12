@@ -56,3 +56,4 @@ SENTRY_CONFIG_YML=sentry/config.yml
 # between upgrades as task signatures may change across
 # versions
 STOP_TIMEOUT=60 # seconds
+
