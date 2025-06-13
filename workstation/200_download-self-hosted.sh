@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 
+
 # Create getsentry folder and enter.
 mkdir /home/user/getsentry
 cd /home/user/getsentry

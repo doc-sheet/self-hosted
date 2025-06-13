@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 
+
 # Install self-hosted. Assumed `200_download-self-hosted.sh` has already run.
 ./install.sh --skip-commit-check --skip-user-creation --skip-sse42-requirements --no-report-self-hosted-issues
 

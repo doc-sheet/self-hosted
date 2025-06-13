@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 export REPORT_SELF_HOSTED_ISSUES=0 # will be over-ridden in the relevant test
 
 FORCE_CLEAN=1 "./scripts/reset.sh"

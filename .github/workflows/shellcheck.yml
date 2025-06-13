@@ -23,7 +23,12 @@ jobs:
       - name: Run ShellCheck
         run: |
           git diff --name-only -z `git merge-base origin/master HEAD` -- \
-            'install/_lib.sh' \
+            install/_lib.sh \
+            'optional-modifications/**.sh' \
+            'scripts/**.sh' \
+            sentry-admin.sh \
+            unit-test.sh \
+            'workstation/**.sh' \
           | xargs -0 -r -- \
             shellcheck \
               --shell=bash \
