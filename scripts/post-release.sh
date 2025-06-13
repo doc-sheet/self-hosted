@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu
 
+
 # Bring master back to nightlies after merge from release branch
 git checkout master && git pull --rebase
 ./scripts/bump-version.sh '' 'nightly'

@@ -1,6 +1,7 @@
 #!/bin/bash
 set -eu
 
+
 OLD_VERSION="$1"
 NEW_VERSION="$2"
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 set -eEuo pipefail
 
 if [ -n "${DEBUG:-}" ]; then
