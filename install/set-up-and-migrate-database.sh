@@ -1,4 +1,5 @@
 echo "${_group}Setting up / migrating database ..."
+set -x
 
 if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
   # Fixes https://github.com/getsentry/self-hosted/issues/2758, where a migration fails due to indexing issue

@@ -1,4 +1,5 @@
 echo "${_group}Bootstrapping and migrating Snuba ..."
+set -x
 
 if [[ -z "${SKIP_SNUBA_MIGRATIONS:-}" ]]; then
   $dcr snuba-api bootstrap --force

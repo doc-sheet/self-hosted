@@ -80,6 +80,7 @@ function start_service_and_wait_ready() {
     $dc up --force-recreate -d "${options[@]}" "${services[@]}"
     for service in "${services[@]}"; do
       while ! $CONTAINER_ENGINE ps --filter "health=healthy" | grep "$service"; do
+        echo -n ". "
         sleep 2
       done
     done

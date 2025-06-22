@@ -41,9 +41,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends podman podman-docker
 
-          # temporary increate nofile limit
-          echo "* hard nofile 1500000" | sudo tee /etc/security/limits.d/50-podman-ulimits.conf
-
           # TODO: Replace below with podman-compose
           #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
           pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
@@ -54,7 +51,8 @@ jobs:
         env:
           CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
           DEBUG: '1'
-        run: ./unit-test.sh
+        run: |
+          ./unit-test.sh
 
       - name: Integration test (${{ matrix.container_engine }})
         uses: './'

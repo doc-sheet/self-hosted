@@ -124,6 +124,9 @@ runs:
         chmod 755 sentry/enhance-image.sh
         echo "python-ldap" > sentry/requirements.txt
 
+        # increase open files limit for podman
+        sudo prlimit --pid $$ --nofile=1000000:1000000
+
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
     - name: Save Sentry Docker Volume Cache
