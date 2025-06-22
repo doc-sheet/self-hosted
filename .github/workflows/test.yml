@@ -20,7 +20,7 @@ defaults:
     shell: bash
 jobs:
   unit-test:
-    if: github.repository_owner == 'getsentry'
+#    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     name: "unit tests"
     steps:
@@ -34,7 +34,7 @@ jobs:
         run: ./unit-test.sh
 
   integration-test:
-    if: github.repository_owner == 'getsentry'
+#    if: github.repository_owner == 'getsentry'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
