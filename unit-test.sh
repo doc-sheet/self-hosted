@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -x
 export REPORT_SELF_HOSTED_ISSUES=0 # will be over-ridden in the relevant test
-ulimit -a
+ulimit -H -a
+ulimit -S -a
 
 FORCE_CLEAN=1 "./scripts/reset.sh"
 fail=0
