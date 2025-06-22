@@ -1,5 +1,4 @@
 import os
-from os.path import join
 import subprocess
 
 import pytest
@@ -10,18 +9,41 @@ TEST_USER = "test@example.com"
 TEST_PASS = "test123TEST"
 
 
+@pytest.fixture(scope="session")
+def container_engine():
+    if os.getenv("CONTAINER_ENGINE", "docker") == "podman":
+        return "podman"
+
+    return "docker"
+
+
+@pytest.fixture(scope="session")
+def docker_cmd(container_engine):
+    if container_engine == "podman":
+        return ("podman",)
+
+    return ("docker",)
+
+
+@pytest.fixture(scope="session")
+def docker_compose_cmd(container_engine, docker_cmd):
+    if container_engine == "podman":
+        return (*docker_cmd, "compose", "--no-ansi")
+
+    return (*docker_cmd, "compose", "--ansi", "never")
+
+
 @pytest.fixture(scope="session", autouse=True)
-def configure_self_hosted_environment(request):
+def configure_self_hosted_environment(request, docker_compose_cmd):
     subprocess.run(
-        ["docker", "compose", "--ansi", "never", "up", "--wait"],
+        [*docker_compose_cmd, "up", "--wait"],
         check=True,
         capture_output=True,
     )
     # Create test user
     subprocess.run(
         [
-            "docker",
-            "compose",
+            *docker_compose_cmd,
             "exec",
             "-T",
             "web",

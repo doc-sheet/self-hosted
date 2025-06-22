@@ -49,11 +49,11 @@ function reset() {
   $dc down --volumes --remove-orphans --rmi local
 
   # Remove any remaining (likely external) volumes with name matching 'sentry-.*'.
-  for volume in $(docker volume list --format '{{ .Name }}' | grep '^sentry-'); do
+  while read -r volume; do
     docker volume remove "$volume" >/dev/null &&
       echo "Removed volume: $volume" ||
       echo "Skipped volume: $volume"
-  done
+  done < <(docker volume list --format '{{ .Name }}' | grep '^sentry-')
 
   # If we have a version given, switch to it.
   if [ -n "$version" ]; then

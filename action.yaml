@@ -6,6 +6,9 @@ inputs:
   image_url:
     required: false
     description: "The URL to the built relay, snuba, sentry image to test against."
+  container_engine:
+    required: false
+    default: docker
   CODECOV_TOKEN:
     required: false
     description: "The Codecov token to upload coverage."
@@ -49,6 +52,7 @@ runs:
         fi
 
     - name: Get Compose
+      if: ${{ inputs.container_engine == 'docker' }}
       uses: getsentry/self-hosted/get-compose-action@master
 
     - name: Compute Docker Volume Cache Keys
@@ -64,6 +68,7 @@ runs:
         echo "SNUBA_MIGRATIONS_MD5=$SNUBA_MIGRATIONS_MD5" >> $GITHUB_OUTPUT
 
     - name: Restore Sentry Volume Cache
+      if: ${{ inputs.container_engine == 'docker' }}
       id: restore_cache_sentry
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -74,6 +79,7 @@ runs:
           sentry-postgres
 
     - name: Restore Snuba Volume Cache
+      if: ${{ inputs.container_engine == 'docker' }}
       id: restore_cache_snuba
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -84,6 +90,7 @@ runs:
           sentry-clickhouse
 
     - name: Restore Kafka Volume Cache
+      if: ${{ inputs.container_engine == 'docker' }}
       id: restore_cache_kafka
       uses: BYK/docker-volume-cache-action/restore@be89365902126f508dcae387a32ec3712df6b1cd
       with:
@@ -103,6 +110,7 @@ runs:
         # changed. Heats up your head a bit but if you think about it, it makes sense.
         SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
         SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
       shell: bash
       run: |
         cd ${{ github.action_path }}
@@ -118,31 +126,42 @@ runs:
 
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
-    - name: Save Sentry Volume Cache
-      if: steps.restore_cache_sentry.outputs.cache-hit != 'true'
+    - name: Save Sentry Docker Volume Cache
+      if: ${{ steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}
         volumes: |
           sentry-postgres
 
-    - name: Save Snuba Volume Cache
-      if: steps.restore_cache_snuba.outputs.cache-hit != 'true'
+    - name: Save Sentry Podman Volume Cache
+      if: ${{ steps.restore_cache_sentry.outputs.cache-hit != 'true' && inputs.container_engine == 'podman' }}
+      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684
+      with:
+        key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}-podman
+        path: /var/lib/docker/volumes/sentry-postgres.tar
+
+    - name: Save Snuba Docker Volume Cache
+      if: ${{ steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_snuba.outputs.cache-primary-key }}
         volumes: |
           sentry-clickhouse
 
-    - name: Save Kafka Volume Cache
-      if: steps.restore_cache_kafka.outputs.cache-hit != 'true'
+    - name: Save Kafka Docker Volume Cache
+      if: ${{ steps.restore_cache_kafka.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
       uses: BYK/docker-volume-cache-action/save@be89365902126f508dcae387a32ec3712df6b1cd
       with:
         key: ${{ steps.restore_cache_kafka.outputs.cache-primary-key }}
         volumes: |
           sentry-kafka
 
-    - name: Integration Test
+    - name: Integration Test with docker
+      if: ${{ inputs.container_engine == 'docker' }}
+      env:
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
+        CONTAINER_ENGINE_PODMAN: ${{ inputs.container_engine == 'podman' && '1' || '0' }}
       shell: bash
       run: |
         sudo chown root /usr/bin/rsync && sudo chmod u+s /usr/bin/rsync
@@ -152,7 +171,20 @@ runs:
           /var/lib/docker/volumes/sentry-kafka \
           "$RUNNER_TEMP/volumes/"
         cd ${{ github.action_path }}
-        pytest -x --cov --junitxml=junit.xml _integration-test/
+        pytest -s -v -x --cov --junitxml=junit.xml _integration-test/
+
+    - name: Integration Test with podman
+      if: inputs.container_engine == 'podman'
+      env:
+        CONTAINER_ENGINE: ${{ inputs.container_engine }}
+        CONTAINER_ENGINE_PODMAN: ${{ inputs.container_engine == 'podman' && '1' || '0' }}
+      shell: bash
+      run: |
+        for volume in sentry-postgres sentry-clickhouse sentry-kafka; do
+          podman volume export -o "${RUNNER_TEMP}/volumes/${volume}.tar" "$volume"
+        done
+        cd ${{ github.action_path }}
+        pytest -s -v -x --cov --junitxml=junit.xml _integration-test/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v5
