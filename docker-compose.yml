@@ -1,3 +1,5 @@
+x-podman:
+    docker_compose_compat: true
 x-restart-policy: &restart_policy
   restart: unless-stopped
 x-pull-policy: &pull_policy
