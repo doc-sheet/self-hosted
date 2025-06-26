@@ -13,7 +13,7 @@ if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
 
 docker ps -a
           docker compose ps
-          docker compose logs
+          docker compose logs --names --timestamps
 
   if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
     $dcr web upgrade --noinput --create-kafka-topics
