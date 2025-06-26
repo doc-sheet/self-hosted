@@ -11,9 +11,9 @@ if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
     exit 1
   fi
 
-          docker compose ps
-          docker compose logs --names --timestamps || :
-          docker logs sentry-self-hosted-clickhouse-1 || :
+  docker compose ps
+  docker compose logs --names --timestamps || :
+  docker logs sentry-self-hosted-clickhouse-1 || :
 
   if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
     $dcr web upgrade --noinput --create-kafka-topics

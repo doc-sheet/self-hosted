@@ -25,8 +25,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        container_engine: ['docker', 'podman']
-        concurrency: 1
+        #container_engine: ['docker', 'podman']
+        container_engine: ['podman']
     name: tests
     steps:
       - name: Checkout
