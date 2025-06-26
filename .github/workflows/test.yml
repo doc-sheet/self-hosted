@@ -26,6 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         container_engine: ['docker', 'podman']
+        concurrency: 1
     name: tests
     steps:
       - name: Checkout
@@ -43,7 +44,7 @@ jobs:
 
           # TODO: Replace below with podman-compose
           #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
-          pip3 install --user git+https://github.com/doc-sheet/podman-compose.git@ddba1da1e0873f357008fe9f4df8247f682c3279
+          pip3 install --user git+https://github.com/doc-sheet/podman-compose.git@1b673e85220522c6038957dc0bf997d9377385e4
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
           echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
 
