@@ -3,7 +3,8 @@ set -x
 
 docker ps -a
           docker compose ps
-          docker compose logs --names --timestamps
+          docker compose logs --names --timestamps || :
+          docker logs sentry-self-hosted-clickhouse-1 || :
 if [[ -z "${SKIP_SNUBA_MIGRATIONS:-}" ]]; then
   $dcr snuba-api bootstrap --force
 else
@@ -12,6 +13,7 @@ fi
 
 docker ps -a
           docker compose ps
-          docker compose logs --names --timestamps
+          docker compose logs --names --timestamps || :
+          docker logs sentry-self-hosted-clickhouse-1 || :
 
 echo "${_endgroup}"
