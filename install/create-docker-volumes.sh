@@ -1,14 +1,14 @@
 echo "${_group}Creating volumes for persistent storage ..."
-
+set -x
 create_volume() {
-  create_command="$CONTAINER_ENGINE volume create"
+  declare -a create_command=("$CONTAINER_ENGINE" volume create)
   if [ "$CONTAINER_ENGINE" = "podman" ]; then
-    create_command="$create_command --ignore $1"
+    create_command+=("$1")
   else
-    create_command="$create_command --name=$1"
+    create_command+=("--name=$1")
   fi
 
-  $create_command
+  "${create_command[@]}"
 }
 
 echo "Created $(create_volume sentry-clickhouse)."
