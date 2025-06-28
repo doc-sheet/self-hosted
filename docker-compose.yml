@@ -202,7 +202,9 @@ services:
       MAX_MEMORY_USAGE_RATIO: 0.3
     healthcheck:
       test: [
-          "CMD-SHELL",
+          "CMD",
+          "/bin/sh",
+          "-c",
           # Manually override any http_proxy envvar that might be set, because
           # this wget does not support no_proxy. See:
           # https://github.com/getsentry/self-hosted/issues/1537
