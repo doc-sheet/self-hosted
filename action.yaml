@@ -111,6 +111,7 @@ runs:
         SKIP_SENTRY_MIGRATIONS: ${{ steps.restore_cache_sentry.outputs.cache-hit == 'true' && '1' || '' }}
         SKIP_SNUBA_MIGRATIONS: ${{ steps.restore_cache_snuba.outputs.cache-hit == 'true' && '1' || '' }}
         CONTAINER_ENGINE: ${{ inputs.container_engine }}
+        DEBUG: true
       shell: bash
       run: |
         cd ${{ github.action_path }}
