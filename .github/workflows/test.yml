@@ -71,4 +71,4 @@ jobs:
         run: |
           docker compose ps
           docker compose logs
-          docker ps  --format "{{ .Names }}" | xargs docker  inspect --format "{{json .State.Healthcheck }}"
+          docker ps  --format "{{ .Names }}" | xargs docker  inspect --format "{{json .State }}"
