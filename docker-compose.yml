@@ -217,7 +217,7 @@ services:
           # this wget does not support no_proxy. See:
           # https://github.com/getsentry/self-hosted/issues/1537
 #          "http_proxy='' wget --no-verbose --tries=1 --output-document=- http://localhost:8123/ping | grep -q Ok."
-          "http_proxy='' wget --debug --verbose --tries=1 --output-document=- http://localhost:8123/ping | grep -q Ok."
+          "http_proxy='' wget --debug --verbose --tries=1 --output-document=- http://localhost:8123/ping 2>&1"
         ]
       interval: 10s
       timeout: 10s
