@@ -115,6 +115,10 @@ services:
     healthcheck:
       <<: *healthcheck_defaults
       test: redis-cli ping | grep PONG
+        - CMD
+        - /bin/sh
+        - -c
+        - "redis-cli ping | grep -q PONG"
     volumes:
       - "sentry-redis:/data"
       - type: bind
@@ -208,7 +212,7 @@ services:
           # Manually override any http_proxy envvar that might be set, because
           # this wget does not support no_proxy. See:
           # https://github.com/getsentry/self-hosted/issues/1537
-          "http_proxy='' wget -nv -t1 --spider 'http://localhost:8123/' || exit 1",
+          "http_proxy='' wget --no-verbose --tries=1 --output-document=- http://localhost:8123/ping | grep -q Ok."
         ]
       interval: 10s
       timeout: 10s
