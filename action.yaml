@@ -134,7 +134,7 @@ runs:
         sudo systemctl daemon-reload
 
         mkdir -p ~/.config/systemd && echo "DefaultLimitNOFILE=1000001:1000001" | tee -a ~/.config/systemd/user.conf
-        sudo systemctl --user daemon-reload
+        systemctl --user daemon-reload
 
         sudo systemctl show | grep LimitNOFILE
 
