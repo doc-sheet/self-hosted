@@ -72,7 +72,7 @@ x-snuba-defaults: &snuba_defaults
   <<: *restart_policy
   depends_on:
     clickhouse:
-      <<: *depends_on-healthy
+      <<: *depends_on-default
     kafka:
       <<: *depends_on-healthy
     redis:
