@@ -208,6 +208,7 @@ services:
       # If you have high volume and your search return incomplete results
       # You might want to change this to a higher value (and ensure your host has enough memory)
       MAX_MEMORY_USAGE_RATIO: 0.3
+      CLICKHOUSE_DO_NOT_CHOWN: '1'
     healthcheck:
       test: [
           "CMD",
