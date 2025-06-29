@@ -140,6 +140,8 @@ runs:
 
         systemctl --user show | grep LimitNOFILE
 
+        ulimit -n
+
         ./install.sh --no-report-self-hosted-issues --skip-commit-check
 
     - name: Save Sentry Docker Volume Cache
