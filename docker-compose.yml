@@ -194,8 +194,8 @@ services:
         BASE_IMAGE: "altinity/clickhouse-server:23.8.11.29.altinitystable"
     ulimits:
       nofile:
-        soft: 1048576
-        hard: 1048576
+        soft: 262144
+        hard: 262144
     volumes:
       - "sentry-clickhouse:/var/lib/clickhouse"
       - "sentry-clickhouse-log:/var/log/clickhouse-server"
