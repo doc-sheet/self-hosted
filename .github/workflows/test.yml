@@ -72,3 +72,4 @@ jobs:
           docker compose ps
           docker compose logs
           docker ps  --format "{{ .Names }}" | xargs docker  inspect --format "{{json .State }}"
+          docker events --format json --until 1s --since 0

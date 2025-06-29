@@ -211,7 +211,7 @@ services:
     healthcheck:
       test: [
           "CMD",
-          "/bin/sh",
+          "/bin/bash",
           "-c",
           # Manually override any http_proxy envvar that might be set, because
           # this wget does not support no_proxy. See:
