@@ -130,9 +130,8 @@ runs:
         set -x
         # increase open files limit for podman
         # sudo prlimit --pid $$ --nofile=1000000:1000000
-        #  echo "*               hard    nofile            1000001" | sudo tee -a /etc/security/limits.conf
-        #  tail -n 10000 /etc/security/limits.conf
         echo "DefaultLimitNOFILE=1000001:1000001" | sudo tee -a /etc/systemd/system.conf
+        systemctl --user daemon-reload
 
         systemctl --user show | grep LimitNOFILE
 
