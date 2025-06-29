@@ -132,6 +132,10 @@ runs:
         sudo prlimit --pid $$ --nofile=1000000:1000000
         echo "DefaultLimitNOFILE=1000001:1000001" | sudo tee -a /etc/systemd/system.conf
         sudo systemctl daemon-reload
+
+        mkdir -p ~/.config/systemd && echo "DefaultLimitNOFILE=1000001:1000001" | tee -a ~/.config/systemd/user.conf
+        sudo systemctl --user daemon-reload
+
         sudo systemctl show | grep LimitNOFILE
 
         systemctl --user show | grep LimitNOFILE
