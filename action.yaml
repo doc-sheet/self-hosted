@@ -133,7 +133,7 @@ runs:
         echo "DefaultLimitNOFILE=1000001:1000001" | sudo tee -a /etc/systemd/system.conf
         sudo systemctl daemon-reload
 
-        mkdir -p ~/.config/systemd && echo "DefaultLimitNOFILE=1000001:1000001" | tee -a ~/.config/systemd/user.conf
+        mkdir -p ~/.config/systemd/user.conf.d && printf '%s\n%s\n' "[Manager]" "DefaultLimitNOFILE=1000001:1000001" > ~/.config/systemd/user.conf.d/nofile.conf
         systemctl --user daemon-reload
 
         sudo systemctl show | grep LimitNOFILE
