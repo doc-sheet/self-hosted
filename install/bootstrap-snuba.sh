@@ -15,5 +15,8 @@ docker ps -a
 docker compose ps
 docker compose logs --names --timestamps || :
 docker logs sentry-self-hosted-clickhouse-1 || :
+docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "ulimit -a" || :
+docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "echo 123" || :
+docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "wget --verbose http://localhost:8123/ping" || :
 
 echo "${_endgroup}"

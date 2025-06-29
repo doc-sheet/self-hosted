@@ -74,3 +74,6 @@ jobs:
           docker ps  --format "{{ .Names }}" | xargs docker  inspect --format "{{json .State }}"
           docker events --format json --until 1s --since 0
           journalctl --no-pager
+          docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "ulimit -a" || :
+          docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "echo 123" || :
+          docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "wget --verbose http://localhost:8123/ping" || :
