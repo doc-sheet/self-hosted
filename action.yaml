@@ -198,6 +198,7 @@ runs:
         CONTAINER_ENGINE_PODMAN: ${{ inputs.container_engine == 'podman' && '1' || '0' }}
       shell: bash
       run: |
+        set -x
         for volume in sentry-postgres sentry-clickhouse sentry-kafka; do
           podman volume export -o "${RUNNER_TEMP}/volumes/${volume}.tar" "$volume"
         done
