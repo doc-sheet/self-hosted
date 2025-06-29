@@ -157,7 +157,7 @@ runs:
       uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684
       with:
         key: ${{ steps.restore_cache_sentry.outputs.cache-primary-key }}-podman
-        path: /var/lib/docker/volumes/sentry-postgres.tar
+        path: ${{ runner.temp }}/sentry-postgres.tar
 
     - name: Save Snuba Docker Volume Cache
       if: ${{ steps.restore_cache_snuba.outputs.cache-hit != 'true' && inputs.container_engine == 'docker' }}
