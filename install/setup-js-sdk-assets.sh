@@ -14,7 +14,7 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   $dbuild -t sentry-self-hosted-jq-local --platform="$DOCKER_PLATFORM" jq
 
-  jq="docker run --rm -i sentry-self-hosted-jq-local"
+  jq="$CONTAINER_ENGINE run --rm -i sentry-self-hosted-jq-local"
 
   loader_registry=$($dcr --no-deps --rm -T web cat /usr/src/sentry/src/sentry/loader/_registry.json)
   # The `loader_registry` should start with "Updating certificates...", we want to delete that and the subsequent ca-certificates related lines.
@@ -39,8 +39,8 @@ if [[ "${SETUP_JS_SDK_ASSETS:-}" == "1" ]]; then
 
   # Make sure permissions are correct
   # See https://github.com/getsentry/self-hosted/issues/3614 for reported issue
-  $dcr --no-deps nginx find /var/www/js-sdk -type d -exec chmod 755 {} \;
-  $dcr --no-deps nginx find /var/www/js-sdk -type f -exec chmod 644 {} \;
+  $dcr --no-deps nginx find /var/www/js-sdk -type d -exec chmod 755 {} +
+  $dcr --no-deps nginx find /var/www/js-sdk -type f -exec chmod 644 {} +
 
   echo "${_endgroup}"
 fi

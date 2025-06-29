@@ -136,13 +136,10 @@ def test_receive_event(client_login):
     assert response_json["metadata"]["value"] == "a failure"
 
 
-def test_cleanup_crons_running():
+def test_cleanup_crons_running(docker_compose_cmd):
     docker_services = subprocess.check_output(
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "ps",
             "-a",
         ],
@@ -155,7 +152,7 @@ def test_cleanup_crons_running():
     assert len(cleanup_crons) > 0
 
 
-def test_custom_certificate_authorities():
+def test_custom_certificate_authorities(docker_compose_cmd):
     # Set environment variable
     os.environ["COMPOSE_FILE"] = (
         "docker-compose.yml:_integration-test/custom-ca-roots/docker-compose.test.yml"
@@ -329,10 +326,7 @@ def test_custom_certificate_authorities():
 
     subprocess.run(
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "up",
             "--wait",
             "fixture-custom-ca-roots",
@@ -341,10 +335,7 @@ def test_custom_certificate_authorities():
     )
     subprocess.run(
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "run",
             "--no-deps",
             "web",
@@ -355,10 +346,7 @@ def test_custom_certificate_authorities():
     )
     subprocess.run(
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "rm",
             "-s",
             "-f",
@@ -404,13 +392,10 @@ def test_receive_transaction_events(client_login):
     )
 
 
-def test_customizations():
+def test_customizations(docker_compose_cmd):
     commands = [
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "run",
             "--no-deps",
             "web",
@@ -419,10 +404,7 @@ def test_customizations():
             "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
         ],
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "run",
             "--no-deps",
             "--entrypoint=/etc/sentry/entrypoint.sh",
@@ -432,10 +414,7 @@ def test_customizations():
             "if [ ! -e /created-by-enhance-image ]; then exit 1; fi",
         ],
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "run",
             "--no-deps",
             "web",
@@ -444,10 +423,7 @@ def test_customizations():
             "import ldap",
         ],
         [
-            "docker",
-            "compose",
-            "--ansi",
-            "never",
+            *docker_compose_cmd,
             "run",
             "--no-deps",
             "--entrypoint=/etc/sentry/entrypoint.sh",

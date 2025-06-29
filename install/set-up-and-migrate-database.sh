@@ -1,14 +1,19 @@
 echo "${_group}Setting up / migrating database ..."
+set -x
 
 if [[ -z "${SKIP_SENTRY_MIGRATIONS:-}" ]]; then
   # Fixes https://github.com/getsentry/self-hosted/issues/2758, where a migration fails due to indexing issue
-  $dc up --wait postgres
+  start_service_and_wait_ready postgres
 
   os=$($dc exec postgres cat /etc/os-release | grep 'ID=debian')
   if [[ -z $os ]]; then
     echo "Postgres image debian check failed, exiting..."
     exit 1
   fi
+
+  docker compose ps
+  docker compose logs --names --timestamps || :
+  docker logs sentry-self-hosted-clickhouse-1 || :
 
   if [[ -n "${CI:-}" || "${SKIP_USER_CREATION:-0}" == 1 ]]; then
     $dcr web upgrade --noinput --create-kafka-topics

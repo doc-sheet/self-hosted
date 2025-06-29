@@ -19,38 +19,61 @@ defaults:
   run:
     shell: bash
 jobs:
-  unit-test:
-    if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: "unit tests"
+  test:
+#    if: github.repository_owner == 'getsentry'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        #container_engine: ['docker', 'podman']
+        container_engine: ['podman']
+      max-parallel: 1
+    name: tests
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Get Compose
+        if: matrix.container_engine == 'docker'
         uses: ./get-compose-action
 
-      - name: Unit Tests
-        run: ./unit-test.sh
+      - name: Install Podman
+        if: matrix.container_engine == 'podman'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends podman podman-docker
 
-  integration-test:
-    if: github.repository_owner == 'getsentry'
-    runs-on: ubuntu-22.04
-    name: integration test
-    env:
-      REPORT_SELF_HOSTED_ISSUES: 0
-      SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+          # TODO: Replace below with podman-compose
+          #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
+          pip3 install --user git+https://github.com/doc-sheet/podman-compose.git@s-test
+          echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
+          echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
 
-      - name: Use action from local checkout
+      - name: Unit Tests (${{ matrix.container_engine }})
+        env:
+          CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
+          DEBUG: '1'
+        run: |
+          ./unit-test.sh
+
+      - name: Integration test (${{ matrix.container_engine }})
         uses: './'
+        env:
+          REPORT_SELF_HOSTED_ISSUES: 0
+          SELF_HOSTED_TESTING_DSN: ${{ vars.SELF_HOSTED_TESTING_DSN }}
+          CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
         with:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          container_engine: ${{ matrix.container_engine }}
 
       - name: Inspect failure
-        if: failure()
+        if: ${{ failure() || cancelled() }}
         run: |
           docker compose ps
           docker compose logs
+          docker ps  --format "{{ .Names }}" | xargs docker  inspect --format "{{json .State }}"
+          docker events --format json --until 1s --since 0
+          journalctl --no-pager
+          docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "ulimit -a" || :
+          docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "echo 123" || :
+          docker exec sentry-self-hosted-clickhouse-1 /bin/sh -c "wget --verbose http://localhost:8123/ping" || :

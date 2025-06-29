@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
+set -x
 
 source _unit-test/_test_setup.sh
 source install/dc-detect-version.sh
-$dcb --force-rm web
+$dcb web
 $dc pull nginx
 
 export SETUP_JS_SDK_ASSETS=1
 
 source install/setup-js-sdk-assets.sh
 
-sdk_files=$($dcr --no-deps nginx ls -lah /var/www/js-sdk/)
-sdk_tree=$($dcr --no-deps nginx tree /var/www/js-sdk/ | tail -n 1)
-non_empty_file_count=$($dcr --no-deps nginx find /var/www/js-sdk/ -type f -size +1k | wc -l)
+sdk_files=$($dcr --no-deps -T nginx ls -lah /var/www/js-sdk/)
+sdk_tree=$($dcr --no-deps -T nginx tree /var/www/js-sdk/ | tail -n 1)
+non_empty_file_count=$($dcr --no-deps -T nginx find /var/www/js-sdk/ -type f -size +1k | wc -l)
 
 # `sdk_files` should contains 5 lines, '4.*', '5.*', '6.*', `7.*` and `8.*`
 echo $sdk_files
