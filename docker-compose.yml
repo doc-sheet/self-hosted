@@ -210,7 +210,6 @@ services:
       MAX_MEMORY_USAGE_RATIO: 0.3
       CLICKHOUSE_DO_NOT_CHOWN: '1'
     healthcheck:
-      <<: *healthcheck_defaults
       test: [
           "CMD",
           "/bin/bash",
