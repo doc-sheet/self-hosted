@@ -54,6 +54,7 @@ jobs:
           CONTAINER_ENGINE_PODMAN: ${{ matrix.container_engine == 'podman' && '1' || '0' }}
           DEBUG: '1'
         run: |
+          sudo prlimit --pid $$ --nofile=1048576:1048576
           ./unit-test.sh
 
       - name: Integration test (${{ matrix.container_engine }})
