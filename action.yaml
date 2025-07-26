@@ -133,9 +133,11 @@ runs:
         #echo "DefaultLimitNOFILE=1048576:1048576" | sudo tee -a /etc/systemd/system.conf
         echo "*               soft    nofile            1048576" | sudo tee -a /etc/security/limits.conf
         echo "*               hard    nofile            1048576" | sudo tee -a /etc/security/limits.conf
+        #mkdir -p ~/.config/systemd/system.conf.d && printf '%s\n%s\n' "[Manager]" "DefaultLimitNOFILE=1048576:1048576" > ~/.config/systemd/system.conf.d/nofile.conf
         #mkdir -p ~/.config/systemd/user.conf.d && printf '%s\n%s\n' "[Manager]" "DefaultLimitNOFILE=1048576:1048576" > ~/.config/systemd/user.conf.d/nofile.conf
-        mkdir -p ~/.config/systemd/user.conf.d && printf '%s\n%s\n' "[Manager]" "LogLevel=debug" > ~/.config/systemd/user.conf.d/nofile.conf
+        #mkdir -p ~/.config/systemd/user.conf.d && printf '%s\n%s\n' "[Manager]" "LogLevel=debug" > ~/.config/systemd/user.conf.d/nofile.conf
 
+        #sudo systemctl --user daemon-reload
         systemctl --user daemon-reload
         #systemctl --user show | grep LimitNOFILE
 
