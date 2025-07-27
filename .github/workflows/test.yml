@@ -20,7 +20,6 @@ defaults:
     shell: bash
 jobs:
   unit-test:
-    if: github.repository_owner == 'getsentry'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -31,19 +30,20 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get Compose
+        if: matrix.container_engine == 'docker'
         uses: ./get-compose-action
 
-      - name: Unit Tests
+      - name: Unit Tests (${{ matrix.container_engine }})
         run: ./unit-test.sh
 
   integration-test:
-    if: github.repository_owner == 'getsentry'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, ubuntu-24.04-arm]
-        container_engine: ['docker'] # TODO: add 'podman' into the list
+        os: [ubuntu-24.04]
+        #container_engine: ['docker'] # TODO: add 'podman' into the list
+        container_engine: ['podman'] # TODO: add 'podman' into the list
     name: ${{ matrix.os == 'ubuntu-24.04-arm' && (matrix.container_engine == 'docker' && 'integration test (arm64)' || 'integration test (arm64 podman)') || (matrix.container_engine == 'docker' && 'integration test' || 'integration test (podman)') }}
     env:
       REPORT_SELF_HOSTED_ISSUES: 0
@@ -57,10 +57,10 @@ jobs:
         if: matrix.container_engine == 'podman'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends podman
+          sudo apt-get install -y --no-install-recommends podman podman-docker
           # TODO: Replace below with podman-compose
           #       We need this commit to be able to work: https://github.com/containers/podman-compose/commit/8206cc3ea277eee6c2e87d4cd66eba8eae3d44eb
-          pip3 install --user https://github.com/containers/podman-compose/archive/main.tar.gz
+          pip3 install --user git+https://github.com/doc-sheet/podman-compose.git@s-test
           echo "PODMAN_COMPOSE_PROVIDER=podman-compose" >> $GITHUB_ENV
           echo "PODMAN_COMPOSE_WARNING_LOGS=false" >> $GITHUB_ENV
 
@@ -68,3 +68,4 @@ jobs:
         uses: './'
         with:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          container_engine: ${{ matrix.container_engine }}
